@@ -22,3 +22,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('/register',[AuthControlller::class,'create_user']);
 
 Route::post('/login',[AuthControlller::class,'login_user']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/get-user',function(){
+        return response()->json(auth()->user());
+    });
+    Route::post('/logout',[AuthControlller::class,'logout_user']);
+});

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AuthControlller extends Controller
 {
@@ -21,7 +22,7 @@ class AuthControlller extends Controller
             'name'=>$request->name,
             'email'=> $request->email,
             'username'=>$request->username,
-            'password'=>$request->password,
+            'password'=>Hash::make($request->password),
         ]);
 
         return response()->json(['message'=>'user created successfully']);
@@ -29,16 +30,27 @@ class AuthControlller extends Controller
 
     public function login_user(Request $request){
 
-        $auth = $request->validate([
-            'username'=>'required',
-            'password'=>'required'
+        $attr = $request->validate([
+            'username' => 'required|string',
+            'password' => 'required|string|min:6'
         ]);
 
-        if(!Auth::attempt($auth)){
-            return response()->json('crediental not match!');
+
+        if (!Auth::attempt($attr)) {
+            return response('Credentials not match', 401);
         }
 
+        return response()->json([
+            'id' => auth()->user()->id,
+            'user' => auth()->user()->username,
+            'token' => $this->auth()->user()->createToken('API Token')->plainTextToken,
+        ]);
 
-        return response('logged in',200);
+    }
+
+    public function logout_user(){
+        auth()->user()->tokens()->delete();
+
+        return response()->json('Log out successfully!.');
     }
 }

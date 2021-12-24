@@ -36,9 +36,15 @@ return [
     */
 
     'guards' => [
+        'api' => [
+            'driver' => 'token',
+            'provider' => 'users',
+            'hash' => true,
+        ],
         'web' => [
             'driver' => 'session',
             'provider' => 'users',
+            'hash'=>true
         ],
     ],
 
