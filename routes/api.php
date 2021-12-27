@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthControlller;
+use App\Http\Controllers\ConversationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -24,8 +25,10 @@ Route::post('/register',[AuthControlller::class,'create_user']);
 Route::post('/login',[AuthControlller::class,'login_user']);
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/get-user',function(){
-        return response()->json(auth()->user());
-    });
+    Route::get('/get-user',[AuthControlller::class,'getUser']);
+
+    Route::resource('/conversation',ConversationController::class);
+
     Route::post('/logout',[AuthControlller::class,'logout_user']);
+
 });

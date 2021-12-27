@@ -43,9 +43,20 @@ class AuthControlller extends Controller
         return response()->json([
             'id' => auth()->user()->id,
             'user' => auth()->user()->username,
-            'token' => $this->auth()->user()->createToken('API Token')->plainTextToken,
+            'token' => auth()->user()->createToken('API Token')->plainTextToken,
         ]);
 
+    }
+
+    public function getUser() {
+
+        $user = [
+            'name' => auth()->user()->name,
+            'username' => auth()->user()->username,
+            'email' => auth()->user()->email,
+        ];
+
+        return response()->json($user);
     }
 
     public function logout_user(){
