@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Events\MessageSentEvent;
-use App\Events\SendMessageEvent;
 use App\Models\Conversation;
 use Illuminate\Http\Request;
 use Illuminate\Mail\Events\MessageSent;
