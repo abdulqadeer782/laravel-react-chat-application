@@ -27,7 +27,19 @@ Route::post('/login',[AuthControlller::class,'login_user']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/get-user',[AuthControlller::class,'getUser']);
 
-    Route::resource('/conversation',ConversationController::class);
+    Route::get('/get-users',[ConversationController::class,'getAllUsers']);
+
+    Route::group(['prefix'=>'conversation'],function(){
+
+        Route::post('/sent',[ConversationController::class,'sendMessage']);
+
+        Route::post('/room',[ConversationController::class,'chatRoom']);
+
+        Route::post('/room/{id}',[ConversationController::class,'deleteMessage']);
+
+        Route::post('/delete',[ConversationController::class,'deleteConversation']);
+
+    });
 
     Route::post('/logout',[AuthControlller::class,'logout_user']);
 

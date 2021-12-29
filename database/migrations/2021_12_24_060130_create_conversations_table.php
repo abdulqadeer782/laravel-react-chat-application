@@ -18,6 +18,7 @@ class CreateConversationsTable extends Migration
             $table->string('sender_id');
             $table->string('recipient_id');
             $table->text('message_body')->nullable();
+            $table->file('attachments');
             $table->timestamps();
         });
     }

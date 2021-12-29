@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\MessageSentEvent;
 use App\Models\Conversation;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Mail\Events\MessageSent;
 
@@ -14,29 +15,21 @@ class ConversationController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+
+    public function getAllUsers()
     {
-        return response()->json(['message' => 'working !']);
+        $username = auth()->user()->username;
+        $user = User::where('username','!=',$username)->get();
+        return response()->json($user);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create(Request $request)
+    public function sendMessage(Request $request)
     {
-        //
-    }
+        $request->validate([
+            'sender_id' => 'required',
+            'recipient_id' => 'required'
+        ]);
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
         $conv = new Conversation();
 
         $conv->sender_id = $request->sender_id;
@@ -44,53 +37,42 @@ class ConversationController extends Controller
         $conv->message_body = $request->message_body;
         $conv->save();
 
-        event(new MessageSentEvent($conv));
+        broadcast(new MessageSentEvent($conv));
 
-        return response()->json('message sent');
+        return response()->json(['message'=>'message sent!']);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
+    public function chatRoom(Request $request)
     {
-        //
+        $request->validate([
+            'recipient_id' => 'required',
+            'sender_id' => 'required'
+        ]);
+
+        $conv = Conversation::where('sender_id',$request->sender_id)->orWhere('sender_id',$request->recipient_id)->orWhere('recipient_id',$request->sender_id)->orWhere('recipient_id',$request->recipient_id)->orderBy('created_at','desc')->get();
+
+        if($conv->count() > 0){
+            return response()->json($conv);
+        }
+
+        return response()->json(['message' => 'empty!']);
+
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
+    public function deleteMessage($id)
     {
-        //
+        Conversation::find($id)->delete();
+
+        return response()->json(['message'=>'message delete!']);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
+    public function deleteConversation(Request $request)
     {
-        //
+
+        Conversation::where('sender_id',$request->sender_id)->orWhere('sender_id',$request->recipient_id)->orWhere('recipient_id',$request->sender_id)->orWhere('recipient_id',$request->recipient_id)->delete();
+
+        return response()->json(['message'=>'conversation deleted']);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
+
 }

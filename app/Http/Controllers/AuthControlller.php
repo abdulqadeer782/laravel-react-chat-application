@@ -2,10 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Broadcasting\MessageChannel;
+use App\Models\Personal_Access_Token;
+use App\Models\Token;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Laravel\Sanctum\PersonalAccessToken;
+use PhpParser\Parser\Tokens;
 
 class AuthControlller extends Controller
 {
@@ -51,6 +56,7 @@ class AuthControlller extends Controller
     public function getUser() {
 
         $user = [
+            'id' => auth()->user()->id,
             'name' => auth()->user()->name,
             'username' => auth()->user()->username,
             'email' => auth()->user()->email,

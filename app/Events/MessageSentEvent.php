@@ -23,11 +23,12 @@ class MessageSentEvent implements ShouldBroadcast
 
   public function broadcastOn()
   {
-      return ['my-channel'];
+      return new channel('message_channel.',$this->message->to);
   }
 
-  public function broadcastAs()
+  public function broadcastWith()
   {
-      return 'my-event';
+      return ["message" => $this->message];
   }
+
 }
