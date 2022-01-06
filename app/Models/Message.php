@@ -5,21 +5,23 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Conversation extends Model
+class Message extends Model
 {
+    use HasFactory;
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function From()
+    public function from()
     {
-        return $this->belongsTo(User::class, 'id');
+        return $this->belongsTo(User::class,'sender_id');
     }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function To()
+    public function to()
     {
-        return $this->belongsTo(User::class, 'id');
+        return $this->belongsTo(User::class,'recipient_id');
     }
 }

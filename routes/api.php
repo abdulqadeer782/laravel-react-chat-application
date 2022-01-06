@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\AuthControlller;
 use App\Http\Controllers\ConversationController;
+use App\Http\Controllers\TestController;
+use App\Models\Message;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -29,6 +31,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/get-users',[ConversationController::class,'getAllUsers']);
 
+    Route::get('/test',function(){
+        $as = Message::where('id',2)->with('user')->first();
+        return response($as);
+    });
+
     Route::group(['prefix'=>'conversation'],function(){
 
         Route::post('/sent',[ConversationController::class,'sendMessage']);
@@ -42,5 +49,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::post('/logout',[AuthControlller::class,'logout_user']);
+
+    Route::get('/check',[TestController::class,'index']);
 
 });

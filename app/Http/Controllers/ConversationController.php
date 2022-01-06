@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\MessageSentEvent;
 use App\Models\Conversation;
+use App\Models\Message;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Mail\Events\MessageSent;
@@ -26,30 +27,30 @@ class ConversationController extends Controller
     public function sendMessage(Request $request)
     {
         $request->validate([
-            'sender_id' => 'required',
-            'recipient_id' => 'required'
+            'to' => 'required',
+            'from' => 'required'
         ]);
 
-        $conv = new Conversation();
+        $conv = new Message();
 
-        $conv->sender_id = $request->sender_id;
-        $conv->recipient_id = $request->recipient_id;
-        $conv->message_body = $request->message_body;
+        $conv->to = $request->to;
+        $conv->from = auth()->user()->id;
+        $conv->message = $request->message;
         $conv->save();
 
         broadcast(new MessageSentEvent($conv));
 
-        return response()->json(['message'=>'message sent!']);
+        return response()->json(['message'=>'message sent!','message'=>$conv]);
     }
 
     public function chatRoom(Request $request)
     {
         $request->validate([
-            'recipient_id' => 'required',
-            'sender_id' => 'required'
+            'to' => 'required',
+            'from' => 'required'
         ]);
 
-        $conv = Conversation::where('sender_id',$request->sender_id)->orWhere('sender_id',$request->recipient_id)->orWhere('recipient_id',$request->sender_id)->orWhere('recipient_id',$request->recipient_id)->orderBy('created_at','desc')->get();
+        $conv = Conversation::where('to',$request->to)->orWhere('from',$request->from)->orWhere('from',$request->to)->orWhere('from',$request->from)->orderBy('created_at','desc')->get();
 
         if($conv->count() > 0){
             return response()->json($conv);
@@ -69,7 +70,7 @@ class ConversationController extends Controller
     public function deleteConversation(Request $request)
     {
 
-        Conversation::where('sender_id',$request->sender_id)->orWhere('sender_id',$request->recipient_id)->orWhere('recipient_id',$request->sender_id)->orWhere('recipient_id',$request->recipient_id)->delete();
+        Conversation::where('to',$request->to)->orWhere('to',$request->from)->orWhere('from',$request->to)->orWhere('from',$request->from)->delete();
 
         return response()->json(['message'=>'conversation deleted']);
     }
