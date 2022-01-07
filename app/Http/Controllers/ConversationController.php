@@ -50,6 +50,8 @@ class ConversationController extends Controller
             'from' => 'required'
         ]);
 
+        // $dum = 'fdsa';
+
         $conv = Conversation::where('to',$request->to)->orWhere('from',$request->from)->orWhere('from',$request->to)->orWhere('from',$request->from)->orderBy('created_at','desc')->get();
 
         if($conv->count() > 0){
